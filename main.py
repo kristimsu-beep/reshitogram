@@ -134,7 +134,7 @@ async def ai_chat(b:Message,u=Depends(auth)):
     msgs += [{"role":x["role"],"content":x["content"]} for x in history]
     msgs.append({"role":"user","content":b.message})
     async with httpx.AsyncClient(timeout=60) as c:
-        r=await c.post("https://api.groq.com/openai/v1/chat/completions",headers={"Authorization":"Bearer "+GROQ_API_KEY},json={"model":"llama-3.3-70b-versatile","messages":msgs,"temperature":0.7,"max_tokens":1200})
+        r=await c.post("https://api.groq.com/openai/v1/chat/completions",headers={"Authorization":"Bearer "+GROQ_API_KEY},json={"model":"openai/gpt-oss-120b","messages":msgs,"temperature":0.7,"max_tokens":1200})
     if r.status_code>=400: raise HTTPException(502,"Groq API error: "+r.text[:300])
     answer=r.json()["choices"][0]["message"]["content"]
     db.ai_history.insert_many([{"user_id":u["_id"],"role":"user","content":b.message,"created_at":now()},{"user_id":u["_id"],"role":"assistant","content":answer,"created_at":now()}])
